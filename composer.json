@@ -1,0 +1,13 @@
+{
+    "name": "francescogabbrielli/aws-ses-wrapper",
+    "description": "A Utility Wrapper for Aws Ses Client in AWS SDK",
+    "authors": [
+        {
+            "name": "Francesco Gabbrielli",
+            "email": "francescogabbrielli@gmail.com"
+        }
+    ],
+    "require": {
+        "aws/aws-sdk-php": "*"
+    }
+}
