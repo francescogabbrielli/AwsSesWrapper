@@ -1,5 +1,7 @@
 <?php
 
+namespace AwsSesWrapper;
+
 use Aws\Ses\SesClient;
 
 /**
@@ -124,7 +126,7 @@ class AwsSesWrapper
             'profile' => $profile, 
             'http' => [
                 'verify' => false//TODO: fix for production
-            ]            
+            ],
         ];
         
         if (!is_null($configuration_set))
@@ -132,7 +134,7 @@ class AwsSesWrapper
         
         $client = SesClient::factory($config);
         
-        return new AwsSesClient($client, $configuration_set, $from, $charset);
+        return new AwsSesWrapper($client, $configuration_set, $from, $charset);
     }
     
     /**
@@ -171,6 +173,7 @@ class AwsSesWrapper
     {
         $this->async = $async;
         $this->asyncString = $async ? "Async" : "";
+        return $this;
     }
     
     /**
@@ -181,6 +184,7 @@ class AwsSesWrapper
     public function setFrom($from)
     {
         $this->from = $from;
+        return $this;
     }
     
     public function getCharset()
@@ -196,6 +200,7 @@ class AwsSesWrapper
     public function setCharset($charset)
     {
         $this->charset = $charset;
+        return $this;
     }
     
     /**
@@ -209,6 +214,7 @@ class AwsSesWrapper
     public function setData($data) 
     {
         $this->data = $data;
+        return $this;
     }
     
     /**
@@ -222,6 +228,7 @@ class AwsSesWrapper
     public function setTags($tags) 
     {
         $this->tags = $tags;
+        return $this;
     }
     
     /**
@@ -232,6 +239,7 @@ class AwsSesWrapper
     public function setMsgRquest($request) 
     {
         $this->msg_request = $request;
+        return $this;
     }
     
     /**
@@ -242,7 +250,7 @@ class AwsSesWrapper
      * @param array $request AWS request
      * @param boolean $build build the request adding all the data configured in
      *      this class
-     * @return mixed AwsResult (or guzzle promise if async version)
+     * @return mixed AwsResult (or Promise for async version)
      */
     public function invokeMethod($method, $request, $build=False) {
         if ($build)
@@ -255,17 +263,17 @@ class AwsSesWrapper
      * 
      * @param array $json_array template json array
      * @param string $name template name (to force it)
-     * @return AwsResult AWS response
+     * @return mixed AwsResult (or Promise for async version)
      * @throws AwsException if template already exists or wrong syntax
      */
     public function createTemplate($json_array, $name="") 
     {
         if ($this->isVersion2())
-            throw new Exception ("Templates are not allowed in version 2");
+            throw new \Exception ("Templates are not implemented in version 2");
         $template = $json_array;
         if ($name)
             $template["TemplateName"] = $name;
-        return $this->invokeMethod("createTemplate", ["Template" => $json_array]);
+        return $this->invokeMethod("createTemplate", ["Template" => $template]);
     }
 
     /**
@@ -275,34 +283,49 @@ class AwsSesWrapper
      * 
      * @param string $name template name
      * @param array $force_creation template json definition to force creation
-     *      if template does not exists
-     * @return AwsResult AWS response
+     *      if template does not exists. The AwsResult in this case would be
+     *      the createTemplate's one.
+     * @return mixed AwsResult (or Promise for async version)
      * @throws AwsException
      */
     public function getTemplate($name, $force_creation=null)
     {
         if ($this->isVersion2())
-            throw new Exception ("Templates are not allowed in version 2");
-        try {
+            throw new \Exception ("Templates are not implemented in version 2");
+        
+        try 
+        {
             $res = $this->invokeMethod("getTemplate", ['TemplateName' => $name]);
-        } catch(Exception $e) {
-            if (!$force_creation)
+            if ($this->async && !is_null($force_creation))
+            {
+                //async chain
+                return $res->then(null, function($reason) use ($force_creation, $name) {
+                    return $this->createTemplate($force_creation, $name);
+                });
+            }
+            return $res;
+            
+        } catch(\Exception $e) {
+            
+            //sync version
+            if (is_null($force_creation))
                 throw $e;
-            $res = $this->createTemplate($force_creation, $name);
+            return $this->createTemplate($force_creation, $name);
+            
         }
-        return $res;
+        
     }
     
     /**
      * Delete a template on AWS (only V3)
      * 
      * @param string $name template name
-     * @return AwsResult AWS response
+     * @return mixed AwsResult (or Promise for async version)
      */
     public function deleteTemplate($name) 
     {
        if ($this->isVersion2())
-            throw new Exception ("Templates are not allowed in version 2");
+            throw new Exception ("Templates are not implemented in version 2");
         return $this->invokeMethod("deleteTemplate", ['TemplateName' => $name]);
     }
     
@@ -339,7 +362,7 @@ class AwsSesWrapper
         if ($this->tags)
             $mail['Tags'] = $this->buildTags();
             
-        $this->invokeMethod("sendEmail", $mail, true);
+        return $this->invokeMethod("sendEmail", $mail, true);
         
     }
     
@@ -391,7 +414,7 @@ class AwsSesWrapper
     function sendTemplatedEmail($dest, $template_name, $template_data=null) 
     {
         if ($this->isVersion2())
-            throw new Exception ("Templates are not allowed in version 2");
+            throw new Exception ("Templates are not implemented in version 2");
         
         $mail = [
             'Destination'       => $this->buildDestination($dest), // REQUIRED
@@ -429,7 +452,7 @@ class AwsSesWrapper
     function sendBulkTemplatedEmail( $destinations, $template_name) 
     {
         if ($this->isVersion2())
-            throw new Exception ("Templates are not allowed in version 2");
+            throw new Exception ("Templates are not implemented in version 2");
         
         $mail = [
             'Destinations'          => $this->buildDestinations($destinations), // REQUIRED
@@ -501,7 +524,8 @@ class AwsSesWrapper
      *      "dest"   => destination emails (array ['to' => [...], 'cc' => [...], 'bcc' => [...]])
      *      "data"   => replacement data (array)
      *      "tags"   => tags (array [name1 => value1, ...])
-     * ]
+     * ],
+     * ...
      * </pre>
      * @return array
      */

@@ -1,6 +1,19 @@
 {
+    "autoload": {
+        "psr-4": {
+            "AwsSesWrapper\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "AwsSesWrapper\\Test\\": "tests/"
+        }
+    },
     "name": "francescogabbrielli/aws-ses-wrapper",
+    "homepage": "https://github.com/francescogabbrielli/AwsSesWrapper",
     "description": "A Utility Wrapper for Aws Ses Client in AWS SDK",
+    "keywords": ["aws-ses", "swift", "email", "transport"],
+    "license": "MIT",
     "authors": [
         {
             "name": "Francesco Gabbrielli",
@@ -9,5 +22,8 @@
     ],
     "require": {
         "aws/aws-sdk-php": "*"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "*"
     }
 }
