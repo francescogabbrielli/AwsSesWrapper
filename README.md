@@ -1,7 +1,7 @@
 
 # AwsSesWrapper
 
-This is an utility class to simplify the use of the main features of AWS SES
+This is an utility class to simplify the use of the main features of AWS SES.
 
 Install
 ---
