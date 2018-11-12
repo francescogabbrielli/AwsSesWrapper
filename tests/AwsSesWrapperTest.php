@@ -27,10 +27,11 @@ class AwsSesWrapperTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
+        putenv("HOME=".__DIR__);
         $this->mock = new MockHandler();
         $ses_client = SesClient::factory([
             "region"    => "eu-west-1",
-            "profile"   => "mailtester",
+            "profile"   => "mail-tester",
             'version'   => '2010-12-01',
             "handler"   => $this->mock
         ]);

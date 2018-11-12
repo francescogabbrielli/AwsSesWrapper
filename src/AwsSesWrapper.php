@@ -109,7 +109,7 @@ class AwsSesWrapper
     }
     
     /**
-     * Utility method to instanziate a SES Client stright away
+     * Utility method to instantiate a SES Client straight away
      * 
      * @param string $region Set the correct endpoint region. 
      *      http://docs.aws.amazon.com/general/latest/gr/rande.html#ses_region
@@ -117,7 +117,7 @@ class AwsSesWrapper
      * @param string $configuration_set Configuration Set on AWS SES (or null for v2 api)
      * @param string $from Sender (optional)
      * @param string $charset Charset (optional)
-     * @return \AwsSesClient
+     * @return a new AwsSesWrapper
      */
     public static function factory($region, $profile, $configuration_set, $from="", $charset="UTF-8") {
         
@@ -325,7 +325,7 @@ class AwsSesWrapper
     public function deleteTemplate($name) 
     {
        if ($this->isVersion2())
-            throw new Exception ("Templates are not implemented in version 2");
+            throw new \Exception ("Templates are not implemented in version 2");
         return $this->invokeMethod("deleteTemplate", ['TemplateName' => $name]);
     }
     
@@ -337,7 +337,7 @@ class AwsSesWrapper
      * @param string $subject email subject
      * @param string $html email in HTML format
      * @param string $text email in text format
-     * @return mixed AwsResult (or Promise for async version)
+     * @return mixed Aws\Result (or Promise for async version)
      * @throws AwsException 
      */
     public function sendEmail($dest, $subject, $html, $text)
@@ -374,8 +374,8 @@ class AwsSesWrapper
      *      ["To => [...], "Cc => [...], "Bcc" => [...]]
      *      - Mandatory in v2!
      *      - DO NOT SPECIFIY in v3 unless you want to override raw headers!
-     * @return AwsResult AWS response
-     * @throws AwsException 
+     * @return mixed Aws\Result (or Promise for async version)
+     * @throws Aws\Exception 
      */
     public function sendRawEmail($raw_data, $dest=[]) 
     {
@@ -408,13 +408,13 @@ class AwsSesWrapper
      *      ['to' => [email1, email2, ...], 'cc' => [ etc..], bcc => [etc...]]
      * @param string $template_name template name on AWS SES
      * @param array $template_data template replacement data
-     * @return AwsResult AWS response
-     * @throws AwsException
+     * @return mixed Aws\Result (or Promise for async version)
+     * @throws Aws\Exception
      */
     function sendTemplatedEmail($dest, $template_name, $template_data=null) 
     {
         if ($this->isVersion2())
-            throw new Exception ("Templates are not implemented in version 2");
+            throw new \Exception ("Templates are not implemented in version 2");
         
         $mail = [
             'Destination'       => $this->buildDestination($dest), // REQUIRED
@@ -446,13 +446,13 @@ class AwsSesWrapper
      * 
      * @param array $destinations destinations
      * @param string $template_name template name on AWS SES 
-     * @return AwsResult AWS response
+     * @return mixed Aws\Result (or Promise for async version)
      * @throws AwsException
      */
     function sendBulkTemplatedEmail( $destinations, $template_name) 
     {
         if ($this->isVersion2())
-            throw new Exception ("Templates are not implemented in version 2");
+            throw new \Exception ("Templates are not implemented in version 2");
         
         $mail = [
             'Destinations'          => $this->buildDestinations($destinations), // REQUIRED
