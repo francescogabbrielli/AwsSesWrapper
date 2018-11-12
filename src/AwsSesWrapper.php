@@ -89,7 +89,7 @@ class AwsSesWrapper
      * @param string $from Sender (optional)
      * @param string $charset Charset (optional)
      */
-    public function __construct($client, $configuration, $from="", $charset="UTF-8") 
+    public function __construct($client, $configuration) 
     {
         if (!getenv("HOME"))
             putenv('HOME='. getenv("USERPROFILE"));
@@ -100,9 +100,6 @@ class AwsSesWrapper
 
         $this->tags = array();
         $this->data = array();
-        
-        $this->from = $from;
-        $this->charset = $charset;
         
         $this->async = false;
         $this->asyncString = "";
@@ -119,7 +116,7 @@ class AwsSesWrapper
      * @param string $charset Charset (optional)
      * @return a new AwsSesWrapper
      */
-    public static function factory($region, $profile, $configuration_set, $from="", $charset="UTF-8") {
+    public static function factory($region, $profile, $configuration_set, $handler=null) {
         
         $config = [
             'region' => $region,
@@ -132,9 +129,12 @@ class AwsSesWrapper
         if (!is_null($configuration_set))
             $config['version'] = '2010-12-01';
         
+        if (!is_null($handler))
+            $config['handler'] = $handler;
+        
         $client = SesClient::factory($config);
         
-        return new AwsSesWrapper($client, $configuration_set, $from, $charset);
+        return new AwsSesWrapper($client, $configuration_set);
     }
     
     /**

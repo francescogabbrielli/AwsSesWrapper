@@ -11,8 +11,8 @@
     },
     "name": "francescogabbrielli/aws-ses-wrapper",
     "homepage": "https://github.com/francescogabbrielli/AwsSesWrapper",
-    "description": "A Utility Wrapper for Aws Ses Client in AWS SDK",
-    "keywords": ["aws-ses", "swift", "email", "transport"],
+    "description": "An utility for wrapping Aws SesClient Api (part of AWS SDK)",
+    "keywords": ["aws-ses", "email", "email-templates", "bulk-email"],
     "license": "MIT",
     "authors": [
         {
@@ -21,9 +21,11 @@
         }
     ],
     "require": {
+        "php": "^5.4 || ^7.0",
         "aws/aws-sdk-php": "*"
     },
     "require-dev": {
-        "phpunit/phpunit": "*"
-    }
+        "phpunit/phpunit": "<6"
+    },
+    "type": "library"
 }
