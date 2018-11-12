@@ -2,49 +2,27 @@
 
 namespace AwsSesWrapper\Test;
 
+use AwsSesWrapper\Test\AwsSesWrapperTestCase;
+
 use AwsSesWrapper\AwsSesWrapper;
-use Aws\MockHandler;
 use Aws\Command;
+use Aws\MockHandler;
 use Aws\Result;
 use Aws\Ses\Exception\SesException;
-use Aws\Ses\SesClient;
-
 
 /**
- * Class AwsSesWrapperTest
+ * Class AwsSesWrapperTest for V3 Api
  */
-class AwsSesWrapperTest extends \PHPUnit_Framework_TestCase
+class AwsSesWrapperTest extends AwsSesWrapperTestCase
 {
-    /**
-     * @var MockHandler 
-     */
-    protected $mock;
-    
-    /**
-     * @var AwsSesWrapper
-     */
-    protected $client;
-
     public function setUp()
     {
-        putenv("HOME=".__DIR__);
+        putenv("HOME=".__DIR__."/..");
         $this->mock = new MockHandler();
-        $ses_client = SesClient::factory([
-            "region"    => "eu-west-1",
-            "profile"   => "mail-tester",
-            'version'   => '2010-12-01',
-            "handler"   => $this->mock
-        ]);
-        $this->client = new AwsSesWrapper($ses_client, "Config1");
-        $this->client->setFrom("MailTester <mailtester@francescogabbrielli.it>");
-        $this->client->setCharset("UTF-8");
-    }
-    
-    public function testSetup() 
-    {
-        $this->assertEquals("eu-west-1", $this->client->getSesClient()->getConfig("signing_region"));
-        $this->assertFalse($this->client->isAsync());
-        $this->assertEquals("UTF-8", $this->client->getCharset());
+        $this->client = 
+                AwsSesWrapper::factory("eu-west-1", "mail-tester", "Config1", $this->mock)
+                    ->setFrom("MailTester <mailtester@francescogabbrielli.it>")
+                    ->setCharset("UTF-8");
     }
     
     public function testGetTemplateExistingSync() 
@@ -104,18 +82,6 @@ class AwsSesWrapperTest extends \PHPUnit_Framework_TestCase
     {
         $this->mock->append(new Result());
         $result = $this->client->deleteTemplate("Template");
-        $this->assertInstanceOf(Result::class, $result);
-    }
-    
-    public function testSendEmailSync()
-    {
-        $this->mock->append(new Result());
-        $this->client->setTags(["id" => "6023"]);
-        $result = $this->client->sendEmail(
-            ["to" => ["mailtester@francescogabbrielli.it"]],
-            "Test Simple Email",
-            "<h1>Hello</h1><p>This is a fake test</p>",
-            "Hello,\n this is a fake test");
         $this->assertInstanceOf(Result::class, $result);
     }
     

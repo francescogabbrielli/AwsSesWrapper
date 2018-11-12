@@ -8,8 +8,13 @@
         <log type="coverage-clover" target="build/logs/coverage.xml" />
     </logging>
     <testsuites>
-        <testsuite name="francescogabbrielli/aws-ses-wrapper">
-            <directory>tests</directory>
+        <testsuite name="Test V2">
+            <!--directory suffix="Test.php" phpVersion="5.5.0" phpVersionOperator="lt">/tests/v2</directory-->
+            <file phpVersion="5.5.0" phpVersionOperator="lt">./tests/v2/AwsSesWrapperTest.php</file>
+        </testsuite>
+        <testsuite name="Test V3">
+            <!--directory suffix="Test.php" phpVersion="5.5.0">/tests/v3</directory-->
+            <file phpVersion="5.5.0" phpVersionOperator=">=">./tests/v3/AwsSesWrapperTest.php</file>
         </testsuite>
     </testsuites>
 </phpunit>
