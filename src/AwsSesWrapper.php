@@ -232,7 +232,19 @@ class AwsSesWrapper
     }
     
     /**
-     * Set the full message request
+     * Set a field in the message request (ie. ReturnPath, etc...)
+     *
+     * @param string $name field name
+     * @param mixed $value the field value
+     */
+    public function setField($name, $value)
+    {
+        $this->msg_request[$name] = $value;
+        return $this;
+    }
+    
+    /**
+     * Set the full message request (this overwrites all other settings)
      * 
      * @param array $request
      */
