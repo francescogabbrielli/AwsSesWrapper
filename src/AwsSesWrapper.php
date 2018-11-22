@@ -205,6 +205,20 @@ class AwsSesWrapper
             echo "<pre>".$string_msg."</pre>\n";
     }
     
+    public function setDebug($debug)
+    {
+        $this->debug = $debug;
+    }
+    
+    private function _debug($msg)
+    {
+        $string_msg = is_string($msg) ? $msg : json_encode($msg, JSON_PRETTY_PRINT);
+        if (is_callable($this->debug))
+            $this->debug($string_msg);
+        else if ($this->debug)
+            echo "<pre>".$string_msg."</pre>";
+    }
+    
     /**
      * Set sender 
      * 
