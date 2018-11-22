@@ -78,6 +78,12 @@ class AwsSesWrapper
      * @var string
      */
     private $asyncString;
+    
+    /**
+     *
+     * @var mixed callable or boolean
+     */
+    private $debug;
 
     
     /**
@@ -165,15 +171,38 @@ class AwsSesWrapper
     }
     
     /**
-     * Switch between sync/async version
+     * Switch between sync/async version.
+     * 
+     * NOTE: This has no effect on v2 Api
      * 
      * @param boolean async True or False
      */
     public function setAsync($async)
     {
+        if ($this->version2)
+            return $this;
         $this->async = $async;
         $this->asyncString = $async ? "Async" : "";
         return $this;
+    }
+    
+    /**
+     * Debug requests
+     * 
+     * @param mixed $debug boolean or callable
+     */
+    public function setDebug($debug)
+    {
+        $this->debug = $debug;
+    }
+    
+    private function _debug($msg)
+    {
+        $string_msg = is_string($msg) ? $msg : json_encode($msg, JSON_PRETTY_PRINT);
+        if (is_callable($this->debug))
+            ${$this->debug}($string_msg);
+        else if ($this->debug)
+            echo "<pre>".$string_msg."</pre>\n";
     }
     
     /**
@@ -247,7 +276,7 @@ class AwsSesWrapper
      * Set the full message request (this overwrites all other settings)
      * 
      * @param array $request
-     */
+     */    
     public function setMsgRquest($request) 
     {
         $this->msg_request = $request;
@@ -267,6 +296,8 @@ class AwsSesWrapper
     public function invokeMethod($method, $request, $build=False) {
         if ($build)
             $request = $this->buildRequest($request);
+        if ($this->debug)
+            $this->_debug($request);
         return $this->ses_client->{$method.$this->asyncString}($request);
     }
         
@@ -434,7 +465,7 @@ class AwsSesWrapper
         //    'SourceArn' => '<string>',
             'Template'          => $template_name, // REQUIRED
         //    'TemplateArn' => '<string>',
-            'TemplateData'      => $this->buildReplacements($template_data)
+            'TemplateData'      => $this->buildReplacements($template_data?:$this->data)
         ];
                         
         if ($this->tags)
@@ -472,7 +503,7 @@ class AwsSesWrapper
         //    'SourceArn' => '<string>',
             'Template'              => $template_name, // REQUIRED
         //    'TemplateArn' => '<string>',
-            'DefaultTemplateData'   => $this->buildReplacements(),// REQUIRED
+            'DefaultTemplateData'   => $this->buildReplacements($this->data),// REQUIRED
         ];
         
                 
@@ -522,9 +553,9 @@ class AwsSesWrapper
      * @param array $data
      * @return string
      */
-    private function buildReplacements($data=null)
+    private function buildReplacements($data)
     {
-        return is_string($data) ? $data : json_encode($data?:$this->data);
+        return is_string($data) ? $data : json_encode($data, JSON_FORCE_OBJECT);
     }
 
     /**
