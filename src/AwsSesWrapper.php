@@ -200,7 +200,7 @@ class AwsSesWrapper
     {
         $string_msg = is_string($msg) ? $msg : json_encode($msg, JSON_PRETTY_PRINT);
         if (is_callable($this->debug))
-            ${$this->debug}($string_msg);
+            call_user_func($this->debug, $string_msg);
         else if ($this->debug)
             echo "<pre>".$string_msg."</pre>\n";
     }
