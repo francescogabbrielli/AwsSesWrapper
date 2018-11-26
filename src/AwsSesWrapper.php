@@ -206,6 +206,16 @@ class AwsSesWrapper
     }
     
     /**
+     * Get current sender
+     * 
+     * @return string
+     */
+    public function getFrom()
+    {
+        return $this->from;
+    }
+    
+    /**
      * Set sender 
      * 
      * @param string $from
@@ -233,6 +243,16 @@ class AwsSesWrapper
     }
     
     /**
+     * Get current replacement data
+     * 
+     * @return array
+     */
+    public function getData()
+    {
+        return $this->data;
+    }
+    
+    /**
      * Default replacement data for the template (only v3).
      * 
      * Each destination specifc data are to be passed inside the sendBulk destinations 
@@ -244,6 +264,16 @@ class AwsSesWrapper
     {
         $this->data = $data;
         return $this;
+    }
+    
+    /**
+     * Get current tags
+     * 
+     * @return array
+     */
+    public function getTags()
+    {
+        return $this->tags;
     }
     
     /**
