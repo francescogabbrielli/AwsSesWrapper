@@ -255,14 +255,19 @@ class AwsSesWrapper
     /**
      * Default replacement data for the template (only v3).
      * 
-     * Each destination specifc data are to be passed inside the sendBulk destinations 
+     * Specifc data for each destination are to be passed inside the sendBulk 
+     * destinations 
      * 
-     * @param array $data array
+     * @param mixed $data string or array
+     * @param mixed $value the value of a single string data
      * @see sendBulkTemplatedEmail.
      */
-    public function setData($data) 
+    public function setData($data, $value=null) 
     {
-        $this->data = $data;
+        if (is_array($data))
+            $this->data = $data;
+        else if (is_string($data))
+            $this->data[$data] = $value;
         return $this;
     }
     
@@ -279,14 +284,18 @@ class AwsSesWrapper
     /**
      * Default tags (for v3).
      * 
-     * Each destination tags are to be passed inside the sendBulk destinations
+     * Tags for each destination are to be passed inside the sendBulk destinations
      * 
-     * @param array $tags array [name1 => value1, etc]
+     * @param mixed $tags string or array [name1 => value1, etc]
+     * @param string $value the value of a single string tag
      * @see sendBulkTemplatedEmail
      */
-    public function setTags($tags) 
+    public function setTags($tags, $value=null) 
     {
-        $this->tags = $tags;
+        if (is_array($tags))
+            $this->tags = $tags;
+        else if (is_string($tags))
+            $this->tags[$tags] = $value;
         return $this;
     }
     
